@@ -16,13 +16,11 @@ export const createUser = async (userData: userSignup) => {
 }
 
 
-export const ifUserExist = async (email: userSignup["email"]) => {
+export const fetchUserData = async (email: userSignup["email"]) => {
     const query = 'SELECT * FROM users where email= $1'
     const data = [email]
     const res = await pool.query(query, data)
     console.log(res.rowCount);
-    return res.rowCount
-    
-    
+    return res.rows[0]   
 }
 
