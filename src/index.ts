@@ -1,8 +1,11 @@
 import express from "express";
 import pool from "./db/dbConfig";
 
+
 const app = express()
 const port = 3000
+
+app.use(express.json())
 
 
 async function testDbConnection(){
@@ -21,6 +24,9 @@ testDbConnection()
 app.get('/', (req, res) => {
     res.send('Hello from server')
 })
+
+const authRoutes=require("./routes/authRoutes")
+app.use("/api/auth", authRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
