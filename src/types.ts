@@ -1,4 +1,4 @@
-import {z} from "zod"
+import { z } from "zod"
 
 const SignupSchema = z.object({
     name: z.string({
@@ -27,7 +27,7 @@ const SignupSchema = z.object({
     })
 })
 
-type userSignup=z.infer<typeof SignupSchema >
+type UserSignup=z.infer<typeof SignupSchema >
 
 
 const LoginSchema = SignupSchema.pick({
@@ -35,6 +35,6 @@ const LoginSchema = SignupSchema.pick({
     password:true
 })
 
-type userLogin = z.infer<typeof LoginSchema>
+type UserLogin = z.infer<typeof LoginSchema>
 
-export {SignupSchema,userSignup,LoginSchema,userLogin}
+export {SignupSchema,UserSignup,LoginSchema,UserLogin}

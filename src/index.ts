@@ -1,5 +1,9 @@
+import { Request, Response } from "express"
+import pool from "./db/dbConfig"
 import express from "express";
-import pool from "./db/dbConfig";
+import authRoutes from "./routes/auth"
+import dotenv from "dotenv";
+dotenv.config();
 
 
 const app = express()
@@ -21,11 +25,11 @@ async function testDbConnection(){
 
 testDbConnection()
 
-app.get('/', (req, res) => {
-    res.send('Hello from server')
+app.get('/', (req:Request, res:Response) => {
+    res.status(201).json({"message": 'Hello from server'})
 })
 
-const authRoutes=require("./routes/authRoutes")
+
 app.use("/api/auth", authRoutes);
 
 app.listen(port, () => {

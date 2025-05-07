@@ -1,30 +1,26 @@
-import { ZodError } from "zod";
-import { userSignup, SignupSchema, LoginSchema, userLogin } from "../types";
-import { Request, Response } from "express";
-import { createUser, fetchUserData } from "../controllers/authControllers";
-require('dotenv').config()
+import { UserSignup, SignupSchema, LoginSchema, UserLogin } from "../types";
+import {  RequestHandler} from "express";
+import { addUserToDb, fetchUserData } from "../models/auth";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-const express = require("express")
-const router = express.Router()
-const bcrypt = require('bcrypt');
-const jwt=require("jsonwebtoken")
 
-router.post("/signup", async function (req: Request, res: Response) {
-
-    try {
+ export const createUser :RequestHandler= async (req, res) =>{
+    
+        try {
        
         const reqData = SignupSchema.safeParse(req.body)
         if (reqData.success) {
             
-            const userData:userSignup = reqData.data
-            if (userData.confirm_password != userData.password) {
-                res.status(400).json({
+            const parsedReqData:UserSignup = reqData.data
+            if (parsedReqData.confirm_password != parsedReqData.password) {
+                 res.status(400).json({
                     "message": "Passwords do not match ",
                      "field":"confirm_password"
                  })
             }
 
-            const checkUserExist=await fetchUserData(userData.email)
+            const checkUserExist=await fetchUserData(parsedReqData.email)
             
             if (checkUserExist) {
                 res.status(409).json({
@@ -33,7 +29,7 @@ router.post("/signup", async function (req: Request, res: Response) {
                 })
             } else {
 
-                const newUser = await createUser(userData);
+                const newUser = await addUserToDb(parsedReqData);
                 res.status(201).json({
                     "message": "User registered successfully.",
                     "email": newUser.email
@@ -46,7 +42,7 @@ router.post("/signup", async function (req: Request, res: Response) {
                 message: zodError.message,
                 field: zodError.path[0]
             }));
-            return res.status(400).json({ errors });     
+             res.status(400).json({ errors });     
         }
     
     } catch (error) {
@@ -54,18 +50,20 @@ router.post("/signup", async function (req: Request, res: Response) {
         res.status(500).json({"message":"Internal Server Error"})
       
    }
-})
+
+}
 
 
 
-router.post("/login", async function (req: Request, res: Response) {
-    try {
+
+export const loginUser:RequestHandler = async (req, res) => {
+        try {
         const reqData = LoginSchema.safeParse(req.body)
         if (reqData.success) {
 
-            const loginData: userLogin = reqData.data
+            const parsedReqData: UserLogin = reqData.data
             
-            const userData = await fetchUserData(loginData.email)
+            const userData = await fetchUserData(parsedReqData.email)
             
             if (!userData) {
                 res.status(401).json({
@@ -73,7 +71,7 @@ router.post("/login", async function (req: Request, res: Response) {
                 })
             }
 
-            if (bcrypt.compareSync(loginData.password, userData.password) ) {
+            if (bcrypt.compareSync(parsedReqData.password, userData.password) ) {
                 
                 console.log(userData)
 
@@ -81,7 +79,7 @@ router.post("/login", async function (req: Request, res: Response) {
                     {
                         id: userData.id, 
                     },
-                    process.env.JWT_SECRET_KEY,
+                    process.env.JWT_SECRET_KEY as string,
                     {
                         expiresIn:'1h'
                     }
@@ -113,17 +111,14 @@ router.post("/login", async function (req: Request, res: Response) {
                 message: zodError.message,
                 field: zodError.path[0]
             }));
-            return res.status(400).json({ errors });   
+            res.status(400).json({ errors });   
         }
     
    } catch (error) {
     res.status(500).json({"message":"Internal Server Error"})
    }
-})
+}
 
 
 
 
-
-
-module.exports=router
