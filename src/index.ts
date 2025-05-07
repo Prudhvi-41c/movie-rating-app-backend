@@ -1,8 +1,15 @@
+import { Request, Response } from "express"
+import pool from "./db/dbConfig"
 import express from "express";
-import pool from "./db/dbConfig";
+import authRoutes from "./routes/auth"
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const app = express()
 const port = 3000
+
+app.use(express.json())
 
 
 async function testDbConnection(){
@@ -18,9 +25,12 @@ async function testDbConnection(){
 
 testDbConnection()
 
-app.get('/', (req, res) => {
-    res.send('Hello from server')
+app.get('/', (req:Request, res:Response) => {
+    res.status(201).json({"message": 'Hello from server'})
 })
+
+
+app.use("/api/auth", authRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
