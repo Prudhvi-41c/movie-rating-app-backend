@@ -1,27 +1,27 @@
+import { Request, Response } from "express"
 import express from "express";
-import pool from "./db/dbConfig";
+import authRoutes from "./routes/auth"
+import dotenv from 'dotenv'
+import { testDbConnection } from "./db/setup";
+
+dotenv.config()
+
+
 
 const app = express()
 const port = 3000
 
+app.use(express.json())
 
-async function testDbConnection(){
-   try {
-       const res = await pool.query('SELECT NOW()')
-       console.log('Database is sucessfully connected ')
-       console.log(res.rows[0].now);
-   } catch (error) {
-       console.log("Error in connecting to the database")
-       console.log(error)
-   }
-}
 
-testDbConnection()
-
-app.get('/', (req, res) => {
-    res.send('Hello from server')
+app.get('/', (req:Request, res:Response) => {
+    res.status(200).json({"message": 'Hello from server'})
 })
+
+
+app.use("/api/auth", authRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
+     testDbConnection()
 })
