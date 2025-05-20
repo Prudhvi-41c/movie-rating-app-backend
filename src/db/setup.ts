@@ -12,4 +12,18 @@ const pool = new Pool({
     idleTimeoutMillis:10000,
 })
 
+async function testDbConnection(){
+   try {
+       const res = await pool.query('SELECT NOW()')
+       console.log('Database is sucessfully connected ')
+       console.log(res.rows[0].now);
+   } catch (error) {
+       console.log("Error in connecting to the database")
+       console.log(error)
+   }
+}
+
+testDbConnection()
+
+
 export default pool;
