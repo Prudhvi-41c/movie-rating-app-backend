@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import dotenv from "dotenv";
 dotenv.config();
 
-const pool = new Pool({
+ const pool = new Pool({
     user:process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     host: process.env.DB_HOST,
@@ -12,7 +12,7 @@ const pool = new Pool({
     idleTimeoutMillis:10000,
 })
 
-async function testDbConnection(){
+export async function testDbConnection(){
    try {
        const res = await pool.query('SELECT NOW()')
        console.log('Database is sucessfully connected ')
@@ -22,8 +22,5 @@ async function testDbConnection(){
        console.log(error)
    }
 }
-
-testDbConnection()
-
 
 export default pool;

@@ -1,5 +1,5 @@
-import { UserSignup, SignupSchema } from "../types/user_signup";
-import { UserLogin,LoginSchema } from "../types/user_login";
+import { UserSignup, SignupSchema } from "../types/auth";
+import { UserLogin,LoginSchema } from "../types/auth";
 import {  RequestHandler, Request,Response} from "express";
 import { addUserToDb, fetchUserData } from "../models/auth";
 import bcrypt from "bcrypt";

@@ -29,4 +29,13 @@ const SignupSchema = z.object({
 
 type UserSignup = z.infer<typeof SignupSchema>
 
-export { SignupSchema, UserSignup }
+
+const LoginSchema = SignupSchema.pick({
+    email: true,
+    password:true
+})
+
+type UserLogin = z.infer<typeof LoginSchema>
+
+
+export { SignupSchema, UserSignup ,LoginSchema,UserLogin}

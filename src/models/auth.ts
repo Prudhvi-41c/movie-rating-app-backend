@@ -1,5 +1,5 @@
 
-import { UserSignup } from "../types/user_signup";
+import { UserSignup } from "../types/auth";
 import pool from "../db/setup";
 
 
