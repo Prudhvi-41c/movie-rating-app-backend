@@ -37,5 +37,12 @@ const LoginSchema = SignupSchema.pick({
 
 type UserLogin = z.infer<typeof LoginSchema>
 
+type Decoded = {
+  id: number;
+  iat: number;
+  exp: number;
+}
 
-export { SignupSchema, UserSignup ,LoginSchema,UserLogin}
+export { SignupSchema, UserSignup, LoginSchema, UserLogin ,Decoded}
+
+
