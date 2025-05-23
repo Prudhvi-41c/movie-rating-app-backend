@@ -3,13 +3,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { Decoded } from "../types/auth";
 
-declare global {
-  namespace Express {
-    interface Request {
-      userId: number;
-    }
-  }
-}
+
 
 export const jwtVerification = function (
   req: Request,
