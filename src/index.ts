@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import express from "express";
 import authRoutes from "./routes/auth"
 import genreRoutes from "./routes/genres"
+import contentRoutes from './routes/content'
 import dotenv from 'dotenv'
 import { testDbConnection } from "./db/setup";
 
@@ -21,7 +22,8 @@ app.get('/', (req:Request, res:Response) => {
 
 
 app.use("/api/auth", authRoutes);
-app.use("/api",genreRoutes)
+app.use("/api", genreRoutes);
+app.use("/api", contentRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
