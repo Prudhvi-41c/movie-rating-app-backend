@@ -3,7 +3,7 @@ import pool from "../db/setup";
 
 
 export const getSearchContent = async (query_value: string) => {
-    const query = `SELECT c.id, c.name, c.release_date, c.watch_time, c.description, c.poster, c.trailer_link, ct.type, AVG(r.stars) AS average_rating 
+    const query = `SELECT c.id, c.name, c.release_date, c.watch_time, c.description, c.poster, c.trailer_link, ct.type,COALESCE(AVG(r.stars), 0) AS average_rating 
                    FROM content c JOIN content_type ct ON c.type_id = ct.id 
                    LEFT JOIN reviews r ON c.id = r.content_id 
                    WHERE LOWER(c.name) LIKE $1 
