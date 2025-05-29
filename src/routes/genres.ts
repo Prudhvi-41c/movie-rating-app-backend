@@ -4,6 +4,6 @@ import { fetchGenres } from "../controllers/genres";
 
 const router = express.Router();
 
-router.get("/genres", jwtVerification, fetchGenres);
+router.get("/", jwtVerification, fetchGenres);
 
 export default router;

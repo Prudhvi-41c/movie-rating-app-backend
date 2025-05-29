@@ -7,5 +7,5 @@ export  interface Content {
     poster: string,
     trailer_link: string,
     type: string,
-    average_rating: string
+    average_rating: number
 }
