@@ -4,7 +4,6 @@ import { getTypeId } from "../models/contentTypes";
 import { Content } from "../types/content";
 import { fetchGenreData } from "../models/genres";
 import { ContentTypeData } from "../types/contentType";
-import { number } from "zod";
 
 export const fetchFilteredContent: RequestHandler = async (req: Request, res: Response) => {
   try {
