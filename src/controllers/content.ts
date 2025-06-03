@@ -3,6 +3,8 @@ import { getSearchContent, getFilteredContent } from "../models/content";
 import { getTypeId } from "../models/contentTypes";
 import { Content } from "../types/content";
 import { fetchGenreData } from "../models/genres";
+import { ContentTypeData } from "../types/contentType";
+import { number } from "zod";
 
 export const fetchFilteredContent: RequestHandler = async (req: Request, res: Response) => {
   try {
@@ -11,24 +13,33 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
     let genres: string[] = [];
     let genreIds: number[] = [];
     let typeId = null;
+    let filteredContent: Content[];
 
-    if (type === undefined && req.query.genres) {
-      res.status(400).json({
-        message: "type is required",
-      });
-      return;
+    if (type === undefined) {
+      if (req.query.genres) {
+        res.status(400).json({
+          message: "type is required when genres are used",
+        });
+        return;
+      }
+      if (query === undefined) {
+        res.status(400).json({
+          message: "type or query must be provided",
+        });
+        return;
+      }
     }
 
     if (type !== undefined) {
-      const typeData = await getTypeId(type);
+      const contentTypeData: ContentTypeData = await getTypeId(type);
 
-      if (typeData === undefined) {
+      if (contentTypeData === undefined) {
         res.status(400).json({
           message: `type ${type} does not exist`,
         });
         return;
       }
-      typeId = typeData.id;
+      typeId = contentTypeData.id;
     }
 
     if (query !== undefined) {
@@ -45,12 +56,12 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
         return;
       }
     }
-      
+
     if (req.query.genres) {
       genres = Array.isArray(req.query.genres) ? (req.query.genres as string[]) : [req.query.genres as string];
-      const genereData = await fetchGenreData();
+      const genreData = await fetchGenreData();
       genreIds = genres.map((genreFromUser) => {
-        let genre = genereData.find((g) => g.genre.toLocaleLowerCase() === genreFromUser.toLocaleLowerCase());
+        let genre = genreData.find((g) => g.genre.toLocaleLowerCase() === genreFromUser.toLocaleLowerCase());
         if (genre === undefined) {
           return null;
         } else {
@@ -58,7 +69,7 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
         }
       });
     }
-      
+
     for (let i = 0; i < genreIds.length; i++) {
       if (genreIds[i] === null) {
         res.status(400).json({
@@ -68,11 +79,12 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
       }
     }
 
-    const filteredContent: Content[] = await getFilteredContent(typeId, genreIds);
-
-    res.status(200).json({
-      content: filteredContent,
-    });
+    if (typeof typeId === "number") {
+      filteredContent = await getFilteredContent(typeId, genreIds);
+      res.status(200).json({
+        content: filteredContent,
+      });
+    }
   } catch (error) {
     res.status(500).json({
       message: "internal server error",

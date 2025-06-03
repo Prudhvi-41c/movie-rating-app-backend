@@ -1,6 +1,7 @@
 import pool from "../db/setup";
+import { Content } from "../types/content";
 
-export const getSearchContent = async (query_value: string,typeId:number) => {
+export const getSearchContent = async (query_value: string,typeId:number|null):Promise<Content[]> => {
     const query = `SELECT c.id, c.name, c.release_date, c.watch_time, c.description, c.poster, c.trailer_link, ct.type,COALESCE(AVG(r.stars)::NUMERIC(10,1), 0)::FLOAT AS average_rating 
                    FROM content c JOIN content_type ct ON c.type_id = ct.id 
                    LEFT JOIN reviews r ON c.id = r.content_id 
@@ -12,7 +13,7 @@ export const getSearchContent = async (query_value: string,typeId:number) => {
     
 }
 
-export const getFilteredContent = async (typeId: number, genres: number[])=>{
+export const getFilteredContent = async (typeId: number, genres: number[]):Promise<Content[]>=>{
     const query=`SELECT c.id,c.name,c.release_date,c.watch_time,c.description,c.poster,c.trailer_link,ct.type AS content_type,COALESCE(AVG(r.stars)::NUMERIC(10,1), 0)::FLOAT AS average_rating
                 FROM content c JOIN content_type ct ON c.type_id = ct.id
                 LEFT JOIN reviews r ON c.id = r.content_id
