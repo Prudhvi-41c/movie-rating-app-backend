@@ -1,18 +1,32 @@
 import { Request, Response, RequestHandler } from "express";
 import { getSearchContent, getFilteredContent } from "../models/content";
-import { getTypeId } from "../models/contentTypes";
+import { getContentTypeData } from "../models/contentTypes";
 import { Content } from "../types/content";
 import { fetchGenreData } from "../models/genres";
 import { ContentTypeData } from "../types/contentType";
 
 export const fetchFilteredContent: RequestHandler = async (req: Request, res: Response) => {
   try {
+    
+    if (Array.isArray(req.query.type)) {
+      res.status(400).json({
+        message: "multiple types are not suported",
+      });
+      return;
+    }
+
+    if (Array.isArray(req.query.query)) {
+      res.status(400).json({
+        message: "multiple search querys are not supored",
+      });
+      return;
+    }
+
     const query: string = req.query.query as string;
     const type: string = req.query.type as string;
     let genres: string[] = [];
     let genreIds: number[] = [];
     let typeId = null;
-    let filteredContent: Content[];
 
     if (type === undefined) {
       if (req.query.genres) {
@@ -30,9 +44,9 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
     }
 
     if (type !== undefined) {
-      const contentTypeData: ContentTypeData = await getTypeId(type);
+      const contentTypeData: ContentTypeData | undefined = await getContentTypeData(type);
 
-      if (contentTypeData === undefined) {
+      if (!contentTypeData) {
         res.status(400).json({
           message: `type ${type} does not exist`,
         });
@@ -79,7 +93,7 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
     }
 
     if (typeof typeId === "number") {
-      filteredContent = await getFilteredContent(typeId, genreIds);
+      const filteredContent: Content[] = await getFilteredContent(typeId, genreIds);
       res.status(200).json({
         content: filteredContent,
       });
