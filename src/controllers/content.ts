@@ -7,17 +7,17 @@ import { ContentTypeData } from "../types/contentType";
 
 export const fetchFilteredContent: RequestHandler = async (req: Request, res: Response) => {
   try {
-    
+
     if (Array.isArray(req.query.type)) {
       res.status(400).json({
-        message: "multiple types are not suported",
+        message: "multiple types are not supported",
       });
       return;
     }
 
     if (Array.isArray(req.query.query)) {
       res.status(400).json({
-        message: "multiple search querys are not supored",
+        message: "multiple search queries are not supported",
       });
       return;
     }
