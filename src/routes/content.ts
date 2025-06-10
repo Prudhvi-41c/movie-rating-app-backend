@@ -1,9 +1,9 @@
 import express from "express";
 import { jwtVerification } from "../middlewares/auth";
-import { fetchGenres } from "../controllers/genres";
+import { fetchFilteredContent } from "../controllers/content";
 
 const router = express.Router();
 
-router.get("/", jwtVerification, fetchGenres);
+router.get("/", jwtVerification, fetchFilteredContent);
 
 export default router;

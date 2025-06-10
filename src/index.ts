@@ -1,29 +1,27 @@
-import { Request, Response } from "express"
+import { Request, Response } from "express";
 import express from "express";
-import authRoutes from "./routes/auth"
-import genreRoutes from "./routes/genres"
-import dotenv from 'dotenv'
+import authRoutes from "./routes/auth";
+import genreRoutes from "./routes/genres";
+import contentRoutes from "./routes/content";
+import dotenv from "dotenv";
 import { testDbConnection } from "./db/setup";
 
-dotenv.config()
+dotenv.config();
 
+const app = express();
+const port = 3000;
 
+app.use(express.json());
 
-const app = express()
-const port = 3000
-
-app.use(express.json())
-
-
-app.get('/', (req:Request, res:Response) => {
-    res.status(200).json({"message": 'Hello from server'})
-})
-
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Hello from server" });
+});
 
 app.use("/api/auth", authRoutes);
-app.use("/api",genreRoutes)
+app.use("/api/genres", genreRoutes);
+app.use("/api/content", contentRoutes);
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-     testDbConnection()
-})
+  console.log(`Server is running on http://localhost:${port}`);
+  testDbConnection();
+});

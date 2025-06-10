@@ -20,7 +20,7 @@ export const jwtVerification = function (
       function (err, decoded) {
         if (err) {
           res.status(401).json({
-            error: "Token missing or invalid.",
+            error: "token missing or invalid.",
           });
         } else {
           const { id } = decoded as Decoded;
@@ -31,7 +31,7 @@ export const jwtVerification = function (
     );
   } else {
     res.status(401).json({
-      error: "Token missing or invalid.",
+      error: "token missing or invalid.",
     });
   }
 };
