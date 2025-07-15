@@ -119,22 +119,18 @@ export const fetchLatestReleasesContent: RequestHandler = async (req: Request, r
 
 export const fetchTopRatedContent: RequestHandler = async (req: Request, res: Response) => {
   try {
-    if (Array.isArray(req.query.year)) {
-      res.status(400).json({
-        message: "multiple year query params are not supported",
-      });
-      return;
-    }
     let year: number | null = null;
-
-    if ((req.query.year as string) === "") {
-      res.status(400).json({
-        message: "year value when passed as query param, cannot be empty",
-      });
-      return;
-    }
+    let type: string;
+    let typeId: number | null = null;
 
     if (req.query.year) {
+      
+      if (Array.isArray(req.query.year)) {
+        res.status(400).json({
+          message: "multiple year query params are not supported",
+        });
+        return;
+      }
       const parsedYear = Number(req.query.year as string);
 
       if (isNaN(parsedYear)) {
@@ -162,29 +158,20 @@ export const fetchTopRatedContent: RequestHandler = async (req: Request, res: Re
       year = parsedYear;
     }
 
-    if (Array.isArray(req.query.type)) {
-      res.status(400).json({
-        message: "multiple type query params are not supported",
-      });
-      return;
-    }
-
-    const type: string = req.query.type as string;
-    let typeId: number | null = null;
-
-    if (type !== undefined) {
-      if (type === "") {
+    if (req.query.type) {
+      if (Array.isArray(req.query.type)) {
         res.status(400).json({
-          message: "type value when passed as query param cannot be empty",
+          message: "multiple type query params are not supported",
         });
         return;
       }
+      type = req.query.type as string;
 
       const contentTypeData: ContentTypeData | undefined = await getContentTypeData(type);
 
       if (!contentTypeData) {
         res.status(400).json({
-          message: `type ${type} does not exist`,
+          message: `type '${type}' does not exist`,
         });
         return;
       }
@@ -195,6 +182,7 @@ export const fetchTopRatedContent: RequestHandler = async (req: Request, res: Re
     res.status(200).json({
       content: topRatedContent,
     });
+
   } catch (error) {
     res.status(500).json({
       message: "internal server error",

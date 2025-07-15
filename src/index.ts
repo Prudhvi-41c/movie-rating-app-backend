@@ -5,6 +5,7 @@ import genreRoutes from "./routes/genres";
 import contentRoutes from "./routes/content";
 import dotenv from "dotenv";
 import { testDbConnection } from "./db/setup";
+import { jwtVerification } from "./middlewares/auth";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/genres", genreRoutes);
-app.use("/api/content", contentRoutes);
+app.use("/api/content",jwtVerification, contentRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
