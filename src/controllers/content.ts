@@ -1,5 +1,5 @@
 import { Request, Response, RequestHandler } from "express";
-import { getSearchContent, getFilteredContent } from "../models/content";
+import { getSearchContent, getFilteredContent, getLatestReleasesContent, getTopRatedContent } from "../models/content";
 import { getContentTypeData } from "../models/contentTypes";
 import { Content } from "../types/content";
 import { fetchGenreData } from "../models/genres";
@@ -7,7 +7,6 @@ import { ContentTypeData } from "../types/contentType";
 
 export const fetchFilteredContent: RequestHandler = async (req: Request, res: Response) => {
   try {
-
     if (Array.isArray(req.query.type)) {
       res.status(400).json({
         message: "multiple types are not supported",
@@ -98,6 +97,92 @@ export const fetchFilteredContent: RequestHandler = async (req: Request, res: Re
         content: filteredContent,
       });
     }
+  } catch (error) {
+    res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
+
+export const fetchLatestReleasesContent: RequestHandler = async (req: Request, res: Response) => {
+  try {
+    const latestReleasesContent: Content[] = await getLatestReleasesContent();
+    res.status(200).json({
+      content: latestReleasesContent,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
+
+export const fetchTopRatedContent: RequestHandler = async (req: Request, res: Response) => {
+  try {
+    let year: number | null = null;
+    let type: string;
+    let typeId: number | null = null;
+
+    if (req.query.year) {
+      
+      if (Array.isArray(req.query.year)) {
+        res.status(400).json({
+          message: "multiple year query params are not supported",
+        });
+        return;
+      }
+      const parsedYear = Number(req.query.year as string);
+
+      if (isNaN(parsedYear)) {
+        res.status(400).json({
+          message: "year must be a valid number.",
+        });
+        return;
+      }
+
+      if (parsedYear < 1000 || parsedYear > 9999) {
+        res.status(400).json({
+          message: "year must be a 4-digit number.",
+        });
+        return;
+      }
+
+      const currentYear = new Date().getFullYear();
+      if (parsedYear > currentYear) {
+        res.status(400).json({
+          message: `year cannot be in the future. currently we support content only up to ${currentYear}.`,
+        });
+        return;
+      }
+
+      year = parsedYear;
+    }
+
+    if (req.query.type) {
+      if (Array.isArray(req.query.type)) {
+        res.status(400).json({
+          message: "multiple type query params are not supported",
+        });
+        return;
+      }
+      type = req.query.type as string;
+
+      const contentTypeData: ContentTypeData | undefined = await getContentTypeData(type);
+
+      if (!contentTypeData) {
+        res.status(400).json({
+          message: `type '${type}' does not exist`,
+        });
+        return;
+      }
+      typeId = contentTypeData.id;
+    }
+
+    const topRatedContent: Content[] = await getTopRatedContent(typeId, year);
+    res.status(200).json({
+      content: topRatedContent,
+    });
+
   } catch (error) {
     res.status(500).json({
       message: "internal server error",
